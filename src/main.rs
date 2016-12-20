@@ -29,11 +29,6 @@ fn toggle_led(led: u8) {
 }
 
 #[no_mangle]
-pub fn ram_l0dable() {
-    ram();
-}
-
-#[no_mangle]
 #[export_name = "ram"]
 pub fn ram() {
     for _ in 0..10 {
