@@ -1,5 +1,5 @@
 #![feature(lang_items)]
-//#![feature(no_std)]
+#![feature(asm)]
 
 #![no_main]
 #![no_std]
@@ -13,6 +13,12 @@ pub mod lang_items;
 
 mod peripheral;
 use peripheral::gpio_port;
+
+fn delay_nop(duration: u32) {
+    for _ in 0..duration {
+        unsafe { asm!("nop" :::: "volatile"); }
+    }
+}
 
 fn toggle_led(led: u8) {
     match led {
@@ -31,16 +37,13 @@ fn toggle_led(led: u8) {
 #[no_mangle]
 #[export_name = "ram"]
 pub fn ram() {
-    for _ in 0..10 {
-        for _ in 0..10 {
-            for _ in 0..100_000 {
-                toggle_led(4);
-            }
-            toggle_led(3);
-        }
-        toggle_led(2);
+    let mut i = 0;
+    loop {
+        delay_nop(100_000);
+
+        toggle_led(i + 1);
+        i = (i + 1) % 4;
     }
-    toggle_led(1);
 }
 
 #[no_mangle]
