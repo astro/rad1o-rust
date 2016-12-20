@@ -1,0 +1,10 @@
+[build]
+target = "thumbv7em-none-eabihf"
+
+[target.thumbv7em-none-eabihf]
+rustflags = [
+    "-C", "link-arg=-Tld/LPC43xx_M4_memory.ld",
+    "-C", "link-arg=-Tld/LPC4330_M4_memory.ld",
+    "-C", "link-arg=-Tld/l0dable.ld",
+    "-C", "link-arg=-nostartfiles",
+]
