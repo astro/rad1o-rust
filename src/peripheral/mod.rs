@@ -1,4 +1,7 @@
 mod gpio_port;
+mod ssp;
+mod cgu;
+mod ccu;
 
 const SCT: usize = 0x40000000;
 const GPDMA: usize = 0x40002000;
@@ -55,6 +58,26 @@ const SGPIO: usize = 0x40101000;
 
 pub fn gpio_port() -> &'static mut gpio_port::GpioPort {
     unsafe { deref_mut(GPIO_PORT) }
+}
+
+pub fn ssp0() -> &'static mut ssp::Ssp0 {
+    unsafe { deref_mut(SSP0) }
+}
+
+pub fn ssp1() -> &'static mut ssp::Ssp0 {
+    unsafe { deref_mut(SSP1) }
+}
+
+pub fn cgu() -> &'static mut cgu::Cgu {
+    unsafe { deref_mut(CGU) }
+}
+
+pub fn ccu1() -> &'static mut ccu::Ccu1 {
+    unsafe { deref_mut(CCU1) }
+}
+
+pub fn ccu2() -> &'static mut ccu::Ccu1 {
+    unsafe { deref_mut(CCU2) }
 }
 
 unsafe fn deref<T>(address: usize) -> &'static T {
