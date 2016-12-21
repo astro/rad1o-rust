@@ -20,6 +20,10 @@ mod led;
 use led::*;
 
 mod display;
+use display::*;
+mod color;
+use color::*;
+mod rust_logo;
 
 fn delay_nop(duration: u32) {
     for _ in 0..duration {
@@ -27,15 +31,17 @@ fn delay_nop(duration: u32) {
     }
 }
 
-static COLORS: &'static [u8] = &[
-    display::rgb(255, 0, 0),
-    display::rgb(255, 255, 0),
-    display::rgb(0, 255, 0),
-    display::rgb(0, 255, 255),
-    display::rgb(0, 0, 255),
-    display::rgb(255, 0, 255),
+static COLORS: &'static [Color] = &[
+    rgb(255, 127, 127),
+    rgb(255, 255, 127),
+    rgb(127, 255, 127),
+    rgb(127, 255, 255),
+    rgb(127, 127, 255),
+    rgb(255, 127, 255),
 ];
 
+const SQUARE_SIZE: usize = 16;
+const COLOR_DURATION: usize = 32;
 
 #[no_mangle]
 #[export_name = "ram"]
@@ -44,14 +50,29 @@ pub fn ram() {
     loop {
         // delay_nop(100_000);
 
-        led(1).set(i % 2 == 0);
+        LED1.set(i % 2 == 0);
         i += 1;
 
-        display::lcd_display(|x, y| {
-            if (((x + i / 2) / 16) + ((y + i) / 16)) % 2 == 0 {
-                COLORS[(i as usize) / 4 % COLORS.len()]
+        lcd_display(|x, y| {
+            let logo_alpha = rust_logo::get_pixel(x as usize, y as usize);
+            let bg = if (((x + i / 2) / SQUARE_SIZE) + ((y + i) / SQUARE_SIZE)) % 2 == 0 {
+                let bg1 = COLORS[(i as usize) / COLOR_DURATION % COLORS.len()];
+                let bg2 = COLORS[(i + 1 as usize) / COLOR_DURATION % COLORS.len()];
+                bg2.blend(((i % COLOR_DURATION) * 255 / COLOR_DURATION) as u8, &bg1)
             } else {
-                display::rgb(0, 0, 0)
+                rgb(0, 0, 128)
+            };
+
+            let ny = 255 - (y as usize) * 255 / RESY;
+            if logo_alpha == 0 {
+                bg
+            } else {
+                let alpha = if ny < logo_alpha as usize {
+                    ny as u8
+                } else {
+                    logo_alpha
+                };
+                rgb(0, 0, 0).blend(alpha, &bg)
             }
         });
     }

@@ -1,18 +1,13 @@
 use peripheral::{gpio_port, ssp1, cgu, ccu1};
+use color::Color;
 
-pub const RESX: u8 = 130;
-pub const RESY: u8 = 130;
+pub const RESX: usize = 130;
+pub const RESY: usize = 130;
 const TYPE_CMD: u8 = 0;
 const TYPE_DATA: u8 = 1;
 const CGU_SRC_PLL1: u8 = 0x09;
 const SSP_DATA_9BITS: u8  = 0x8;
 const SSP_FRAME_SPI: u8 = 0x00;
-
-pub const fn rgb(r: u8, g: u8, b: u8) -> u8 {
-    (r & 0b11100000) |
-    ((g >> 3) & 0b00011100) |
-    (b >> 6)
-}
 
 pub fn ssp_init(data_size: u8, frame_format: u8, cpol_format: bool, cpha_format: bool, serial_clock_rate: u8, clk_prescale: u8, loopback: bool, ms_mode: bool, slave_out: bool) {
 
@@ -118,21 +113,28 @@ fn lcd_deselect() {
 }
 
 pub fn lcd_display<F>(f: F)
-    where F: Fn(u8, u8) -> u8 {
+    where F: Fn(usize, usize) -> Color {
 
     lcd_select();
 
-    /* set (back) to 8 bpp mode */
+    /* set to 12 bpp mode */
     lcd_write(TYPE_CMD, 0x3a);
-    lcd_write(TYPE_DATA, 2);
+    lcd_write(TYPE_DATA, 3);
 
     // memory write (RAMWR)
     lcd_write(TYPE_CMD, 0x2C);
 
     for y in 0..RESY {
-        for x in 0..RESX {
-	    lcd_write(TYPE_DATA, f(x, y));
-	    // lcd_write(TYPE_DATA, 192);
+        for x in 0..(RESX / 2) {
+            let x1 = x * 2;
+            let c1 = f(x1, y);
+            
+            let x2 = x * 2 + 1;
+            let c2 = f(x2, y);
+            
+	    lcd_write(TYPE_DATA, ((c1.r & 0xF0) | (c1.g >> 4)) as u8);
+	    lcd_write(TYPE_DATA, ((c1.b & 0xF0) | (c2.r >> 4)) as u8);
+	    lcd_write(TYPE_DATA, ((c2.g & 0xF0) | (c2.b >> 4)) as u8);
         }
     }
 
