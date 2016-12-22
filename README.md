@@ -22,3 +22,21 @@ arm-linux-gnueabihf-objcopy --strip-unneeded -O binary target/thumbv7em-none-eab
 ```
 arm-linux-gnueabihf-objdump -SD target/thumbv7em-none-eabihf/debug/rad1o-rust | less
 ```
+
+# TODO
+
+* split into reusable crates: lpc43xx, rad1o, bins
+* app.b1n?
+* Target m0 processor
+
+## Drivers
+
+* Input
+* Audio
+* USB
+* Flash + fatfs
+* Xilinx CPLD?
+* SDR: MAX2837?
+* contrib to cortex-m:
+  * Timers
+  * MPU
