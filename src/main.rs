@@ -6,8 +6,8 @@
 #![no_main]
 #![no_std]
 
-extern crate rlibc;
-extern crate cortex_m;
+// extern crate rlibc;
+// extern crate cortex_m;
 extern crate volatile_register;
 
 #[cfg(target_arch = "arm")]
