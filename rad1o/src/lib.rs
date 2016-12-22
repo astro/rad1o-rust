@@ -9,6 +9,7 @@ extern crate lpc43xx;
 pub mod lang_items;
 
 pub mod led;
+pub mod input;
 pub mod display;
 pub mod color;
 

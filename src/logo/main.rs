@@ -11,6 +11,7 @@ use core::intrinsics::powif32;
 use rad1o::led::*;
 use rad1o::display::*;
 use rad1o::color::*;
+use rad1o::input::*;
 
 mod rust_logo;
 
@@ -24,7 +25,7 @@ static COLORS: &'static [Color] = &[
 ];
 
 const SQUARE_SIZE: usize = 16;
-const COLOR_DURATION: usize = 32;
+const COLOR_DURATION: usize = 8;
 
 fn powi(a: f32, x: i32) -> f32 {
     unsafe {
@@ -36,20 +37,35 @@ fn powi(a: f32, x: i32) -> f32 {
 #[export_name = "ram"]
 pub fn ram() {
     let mut i = 0;
-    loop {
-        // delay_nop(100_000);
-
-        LED1.set(i % 2 == 0);
-        i += 1;
+    let mut bx = 0x00010000;
+    let mut by = 0x00010000;
+    let mut dx = 0i32;
+    let mut dy = 0i32;
+    while ! ENTER.get() {
+        if UP.get() {
+            dy = -1;
+        }
+        else if DOWN.get() {
+            dy = 1;
+        }
+        if LEFT.get() {
+            dx = -1;
+        } else if RIGHT.get() {
+            dx = 1;
+        }
+        bx = (bx as i32 + dx) as usize;
+        by = (by as i32 + dy) as usize;
 
         lcd_display(|x, y| {
             let logo_alpha = rust_logo::get_pixel(x as usize, y as usize);
-            let bg = if (((x + i / 2) / SQUARE_SIZE) + ((y + i) / SQUARE_SIZE)) % 2 == 0 {
+            let bg = if (((bx + x) / SQUARE_SIZE) + ((by + y) / SQUARE_SIZE)) % 2 == 0 {
                 let bg1 = COLORS[(i as usize) / COLOR_DURATION % COLORS.len()];
-                let bg2 = COLORS[(i + 1 as usize) / COLOR_DURATION % COLORS.len()];
+                let bg2 = COLORS[((i / COLOR_DURATION) + 1 as usize) % COLORS.len()];
                 bg2.blend(((i % COLOR_DURATION) * 255 / COLOR_DURATION) as u8, &bg1)
             } else {
-                rgb(0, 0, 128)
+                let bg1 = COLORS[((i as usize) / COLOR_DURATION + 3) % COLORS.len()];
+                let bg2 = COLORS[((i / COLOR_DURATION) + 4 as usize) % COLORS.len()];
+                bg2.blend(((i % COLOR_DURATION) * 255 / COLOR_DURATION) as u8, &bg1)
             };
 
             let ny = 255f32 * (1f32 - powi((y as f32) / (RESY as f32), 2));
@@ -64,7 +80,11 @@ pub fn ram() {
                 rgb(0, 0, 0).blend(alpha, &bg)
             }
         });
+
+        i += 1;
     }
+
+    while ENTER.get() {}
 }
 
 #[no_mangle]
