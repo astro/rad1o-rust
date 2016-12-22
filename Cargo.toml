@@ -4,14 +4,14 @@ version = "0.1.0"
 authors = ["Astro <astro@spaceboyz.net>"]
 
 [dependencies]
-volatile-register = "0.1.2"
-#rust-libcore = "0.0.3"
-#r0 = "0.1.0"
-#cortex-m = "0.1.5"
-#rlibc = "1.0.0"
+rad1o = { version = "0.0.0", path = "rad1o" }
 
 [profile.release]
 lto = true
 panic = 'abort'
 
 [target.thumbv7em-none-eabihf.dependencies]
+
+[[bin]]
+name = "logo"
+path = "src/logo/main.rs"

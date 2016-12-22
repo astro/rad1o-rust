@@ -1,0 +1,11 @@
+[package]
+name = "rad1o"
+version = "0.0.0"
+authors = ["Astro <astro@spaceboyz.net>"]
+
+[dependencies]
+lpc43xx = "0.0.0"
+
+[profile.release]
+lto = true
+panic = 'abort'

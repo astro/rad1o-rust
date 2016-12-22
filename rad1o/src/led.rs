@@ -1,4 +1,4 @@
-use peripheral::gpio_port;
+use lpc43xx::peripheral::gpio_port;
 
 pub trait LED {
     fn toggle(&self);

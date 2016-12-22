@@ -1,4 +1,4 @@
-use peripheral::{gpio_port, ssp1, cgu, ccu1};
+use lpc43xx::peripheral::{gpio_port, ssp1, cgu, ccu1};
 use color::Color;
 
 pub const RESX: usize = 130;

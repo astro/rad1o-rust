@@ -1,37 +1,18 @@
-#![feature(lang_items)]
-#![feature(asm)]
-#![feature(concat_idents)]
-#![feature(const_fn)]
 #![feature(core_intrinsics)]
+#![feature(const_fn)]
 
 #![no_main]
 #![no_std]
 
-// extern crate rlibc;
-// extern crate cortex_m;
-extern crate volatile_register;
+extern crate rad1o;
+
 use core::intrinsics::powif32;
 
-#[cfg(target_arch = "arm")]
-pub mod lang_items;
+use rad1o::led::*;
+use rad1o::display::*;
+use rad1o::color::*;
 
-#[allow(dead_code)]
-mod peripheral;
-
-mod led;
-use led::*;
-
-mod display;
-use display::*;
-mod color;
-use color::*;
 mod rust_logo;
-
-fn delay_nop(duration: u32) {
-    for _ in 0..duration {
-        unsafe { asm!("nop" :::: "volatile"); }
-    }
-}
 
 static COLORS: &'static [Color] = &[
     rgb(255, 127, 127),
