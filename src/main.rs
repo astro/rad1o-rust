@@ -2,6 +2,7 @@
 #![feature(asm)]
 #![feature(concat_idents)]
 #![feature(const_fn)]
+#![feature(core_intrinsics)]
 
 #![no_main]
 #![no_std]
@@ -9,6 +10,7 @@
 // extern crate rlibc;
 // extern crate cortex_m;
 extern crate volatile_register;
+use core::intrinsics::powif32;
 
 #[cfg(target_arch = "arm")]
 pub mod lang_items;
@@ -43,6 +45,12 @@ static COLORS: &'static [Color] = &[
 const SQUARE_SIZE: usize = 16;
 const COLOR_DURATION: usize = 32;
 
+fn powi(a: f32, x: i32) -> f32 {
+    unsafe {
+        powif32(a, x)
+    }
+}
+
 #[no_mangle]
 #[export_name = "ram"]
 pub fn ram() {
@@ -63,11 +71,11 @@ pub fn ram() {
                 rgb(0, 0, 128)
             };
 
-            let ny = 255 - (y as usize) * 255 / RESY;
+            let ny = 255f32 * (1f32 - powi((y as f32) / (RESY as f32), 2));
             if logo_alpha == 0 {
                 bg
             } else {
-                let alpha = if ny < logo_alpha as usize {
+                let alpha = if ny < logo_alpha as f32 {
                     ny as u8
                 } else {
                     logo_alpha
