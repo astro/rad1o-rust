@@ -112,6 +112,7 @@ fn lcd_deselect() {
     lcd_cs_write(true);
 }
 
+// http://www.elecfreaks.com/store/download/datasheet/shield/PCF8833_1.pdf
 pub fn lcd_display<F>(f: F)
     where F: Fn(usize, usize) -> Color {
 
