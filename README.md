@@ -6,6 +6,7 @@ https://rad1o.badge.events.ccc.de/more_hardware
 Download from https://www.lpcware.com/content/nxpfile/lpc43sxx-svd-file
 
 ```
+mkdir src/peripheral
 svd2rust -i LPC43xx_43Sxx.svd gpio > src/peripheral/gpio.rs
 rustfmt src/peripheral/gpio.rs
 ```
