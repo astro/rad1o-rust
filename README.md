@@ -14,14 +14,14 @@ rustfmt src/peripheral/gpio.rs
 # Building
 
 ```
-xargo build --target thumbv7em-none-eabihf -v
-arm-linux-gnueabihf-objcopy --strip-unneeded -O binary target/thumbv7em-none-eabihf/debug/rad1o-rust target/thumbv7em-none-eabihf/debug/rad1o-rust.c1d
+xargo build --release --target thumbv7em-none-eabihf -v
+arm-linux-gnueabihf-objcopy --strip-unneeded -O binary target/thumbv7em-none-eabihf/release/rad1o-rust target/thumbv7em-none-eabihf/release/rad1o-rust.c1d
 ```
 
 ## Inspect build
 
 ```
-arm-linux-gnueabihf-objdump -SD target/thumbv7em-none-eabihf/debug/rad1o-rust | less
+arm-linux-gnueabihf-objdump -SD target/thumbv7em-none-eabihf/release/rad1o-rust | less
 ```
 
 # TODO
