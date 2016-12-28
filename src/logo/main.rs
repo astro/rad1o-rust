@@ -9,7 +9,7 @@ extern crate rad1o;
 use core::intrinsics::powif32;
 
 use rad1o::led::*;
-use rad1o::display::*;
+use rad1o::display;
 use rad1o::color::*;
 use rad1o::input::*;
 
@@ -36,6 +36,8 @@ fn powi(a: f32, x: i32) -> f32 {
 #[no_mangle]
 #[export_name = "ram"]
 pub fn ram() {
+    let lcd = display();
+    
     let mut i = 0;
     let mut bx = 0x00010000;
     let mut by = 0x00010000;
@@ -56,7 +58,7 @@ pub fn ram() {
         bx = (bx as i32 + dx) as usize;
         by = (by as i32 + dy) as usize;
 
-        lcd_display(|x, y| {
+        lcd.display(|x, y| {
             let logo_alpha = rust_logo::get_pixel(x as usize, y as usize);
             let bg = if (((bx + x) / SQUARE_SIZE) + ((by + y) / SQUARE_SIZE)) % 2 == 0 {
                 let bg1 = COLORS[(i as usize) / COLOR_DURATION % COLORS.len()];
@@ -68,7 +70,7 @@ pub fn ram() {
                 bg2.blend(((i % COLOR_DURATION) * 255 / COLOR_DURATION) as u8, &bg1)
             };
 
-            let ny = 255f32 * (1f32 - powi((y as f32) / (RESY as f32), 2));
+            let ny = 255f32 * (1f32 - powi((y as f32) / (lcd.height() as f32), 2));
             if logo_alpha == 0 {
                 bg
             } else {
@@ -96,4 +98,3 @@ loop {}
 pub unsafe fn __aeabi_unwind_cpp_pr1() -> ! {
 loop {}
 }
-
