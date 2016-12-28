@@ -8,7 +8,7 @@ extern crate rad1o;
 
 use core::intrinsics::powif32;
 
-use rad1o::led::*;
+// use rad1o::led::*;
 use rad1o::display;
 use rad1o::color::*;
 use rad1o::input::*;

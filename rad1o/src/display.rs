@@ -1,4 +1,3 @@
-use lpc43xx::peripheral::{gpio_port, ssp1, cgu, ccu1};
 use color::Color;
 use ssp::SSP;
 
@@ -10,26 +9,23 @@ const TYPE_CMD: u8 = 0;
 const TYPE_DATA: u8 = 1;
 
 
+pub trait SelectsDisplay {
+    fn display_cs_write(&self, selected: bool);
+}
+
+
 pub struct PCF8833<S: SSP> {
     ssp: S,
 }
 
 // http://www.elecfreaks.com/store/download/datasheet/shield/PCF8833_1.pdf
-impl<S: SSP> PCF8833<S> {
+impl<S: SSP + SelectsDisplay> PCF8833<S> {
     pub fn new(ssp: S) -> Self {
         PCF8833 {
             ssp: ssp,
         }
     }
     
-    fn lcd_cs_write(value: bool) {
-        if value {
-            gpio_port().set[4].write(|set| set.setp12(true));
-        } else {
-            gpio_port().clr[4].write(|clr| clr.clrp012(true));
-        }
-    }
-
     fn select(&self) {
         /*
          * The LCD requires 9-Bit frames
@@ -55,11 +51,11 @@ impl<S: SSP> PCF8833<S> {
             true
         );
 
-        Self::lcd_cs_write(false);
+        self.ssp.display_cs_write(true);
     }
 
     fn deselect(&self) {
-        Self::lcd_cs_write(true);
+        self.ssp.display_cs_write(false);
     }
 
     fn write(&self, cd: u8, data: u8) {

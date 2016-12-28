@@ -1,4 +1,5 @@
 use lpc43xx::peripheral::{gpio_port, ssp1, cgu, ccu1};
+use display::SelectsDisplay;
 
 pub trait SSP {
     fn init(&self, data_size: u8, frame_format: u8, cpol_format: bool, cpha_format: bool, serial_clock_rate: u8, clk_prescale: u8, loopback: bool, ms_mode: bool, slave_out: bool);
@@ -15,6 +16,16 @@ pub struct SSP1 {
 impl SSP1 {
     pub fn new() -> Self {
         SSP1 {}
+    }
+}
+
+impl SelectsDisplay for SSP1 {
+    fn display_cs_write(&self, selected: bool) {
+        if selected {
+            gpio_port().clr[4].write(|clr| clr.clrp012(true));
+        } else {
+            gpio_port().set[4].write(|set| set.setp12(true));
+        }
     }
 }
 
