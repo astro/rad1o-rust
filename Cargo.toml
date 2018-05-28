@@ -15,3 +15,7 @@ panic = 'abort'
 [[bin]]
 name = "logo"
 path = "src/logo/main.rs"
+
+[[bin]]
+name = "tunnel"
+path = "src/tunnel/main.rs"
