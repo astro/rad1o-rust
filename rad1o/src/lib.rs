@@ -15,6 +15,7 @@ use ssp::SSP1;
 mod display;
 use display::PCF8833;
 pub mod color;
+pub mod m0;
 
 pub fn delay_nop(duration: u32) {
     for _ in 0..duration {

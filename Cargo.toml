@@ -19,3 +19,7 @@ path = "src/logo/main.rs"
 [[bin]]
 name = "tunnel"
 path = "src/tunnel/main.rs"
+
+[[bin]]
+name = "coproc"
+path = "src/coproc/main.rs"
