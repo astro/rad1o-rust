@@ -1,0 +1,12 @@
+[package]
+name = "test"
+version = "0.0.0"
+authors = ["Astro <astro@spaceboyz.net>"]
+
+[dependencies]
+cortex-m = { version = "0.5.2", features = ["inline-asm"] }
+rad1o-l0dable = { path = "../rad1o-l0dable" }
+panic-abort = "0.1.1"
+
+[profile.release]
+lto = true
