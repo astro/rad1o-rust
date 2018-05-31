@@ -1,0 +1,14 @@
+[package]
+name = "rustapp"
+version = "0.0.0"
+authors = ["Astro <astro@spaceboyz.net>"]
+
+[dependencies]
+cortex-m = { version = "0.5.2", features = ["inline-asm"] }
+cortex-m-rt = { version = "0.5.1", features = ["device"] }
+lpc43xx = { version = "0.1.0", features = ["rt"] }
+rad1o-firmware = { path = "../rad1o-firmware" }
+panic-abort = "0.1.1"
+
+[profile.release]
+#lto = true
