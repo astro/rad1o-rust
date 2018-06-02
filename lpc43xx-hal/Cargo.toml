@@ -1,0 +1,15 @@
+[package]
+name = "lpc43xx-hal"
+description = "embedded-hal implementation for the NXP LPC43xx microcontroller platform"
+keywords = ["arm", "cortex-m", "nxp", "lpc", "embedded-hal"]
+categories = ["embedded", "hardware-support", "no-std"]
+version = "0.0.0"
+authors = ["Astro <astro@spaceboyz.net>"]
+license = "Apache-2.0"
+documentation = "https://docs.rs/lpc43xx"
+homepage = "https://github.com/astro/rad1o-rust"
+include = ["Cargo.toml", "**/*.rs"]
+
+[dependencies]
+lpc43xx = "0.1.0"
+embedded-hal = "0.2.1"

@@ -8,16 +8,29 @@ extern crate lpc43xx;
 #[macro_use(entry)]
 extern crate rad1o_firmware as rad1o;
 
-use rad1o::{IdentifyLED};
+use lpc43xx::Peripherals;
+use rad1o::{IdentifyLED, lcd, lcd::RGB12};
 
 
 entry!(main);
 
 fn main() {
-    for n in 0usize..4 {
-        n.set_led(true);
+    0usize.set_led(true);
+
+    let p = Peripherals::take().unwrap();
+    1usize.set_led(true);
+    let mut display = lcd(&p);
+    2usize.set_led(true);
+    loop {
+        4usize.set_led(true);
+        display.select().display(|x, y| RGB12 {
+            r: x as u8,
+            g: y as u8,
+            b: (x ^ y) as u8,
+        });
+        4usize.set_led(false);
+        3usize.set_led(true);
     }
-    loop {}
 }
 
 

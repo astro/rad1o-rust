@@ -35,8 +35,9 @@
 //#![warn(missing_docs)]
 
 extern crate lpc43xx as target;
+extern crate lpc43xx_hal as hal;
 extern crate r0;
-extern crate embedded_hal as hal;
+extern crate embedded_hal;
 
 /// firmware startup
 pub mod startup;
@@ -44,3 +45,6 @@ pub mod startup;
 mod led;
 pub use led::{LED, IdentifyLED};
 pub use led::LED::*;
+/// LCD
+pub mod lcd;
+pub use lcd::lcd;
