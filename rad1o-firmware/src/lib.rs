@@ -38,6 +38,7 @@ extern crate lpc43xx as target;
 extern crate lpc43xx_hal as hal;
 extern crate r0;
 extern crate embedded_hal;
+extern crate vga_framebuffer;
 
 /// firmware startup
 pub mod startup;

@@ -67,7 +67,7 @@ impl<'a, CS: OutputPin, SPI: Transfer<u16>> Selected<'a, CS, SPI> {
         let width = self.pcf.width();
         let height = self.pcf.height();
 
-        /* set to 12 bpp mode */
+        /* set color mode */
         self.write(TYPE_CMD, CMD_COLMOD);
         self.write(TYPE_DATA, C::colmod());
 

@@ -15,6 +15,7 @@ cortex-m-rt = { version = "0.5.1", features = ["device"] }
 lpc43xx = { version = "0.1.0", features = ["rt"] }
 embedded-hal = "0.2.1"
 lpc43xx-hal = { path = "../lpc43xx-hal" }
+vga-framebuffer = "0.2.1"
 
 [profile.release]
 debug = 2
