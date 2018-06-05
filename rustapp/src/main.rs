@@ -10,31 +10,34 @@ extern crate rad1o_firmware as rad1o;
 
 use core::fmt::Write;
 use lpc43xx::Peripherals;
-use rad1o::{IdentifyLED, gpio, lcd, lcd::RGB12, lcd::TextConsole};
+use rad1o::{LED1, LED2, LED3, LED4, gpio, lcd, lcd::RGB12, lcd::TextConsole};
 
 entry!(main);
 
 fn main() {
+    let mut stolen = false;
     let mut p = Peripherals::take()
         .unwrap_or_else(|| {
-            3usize.set_led(true);
+            stolen = true;
             unsafe { Peripherals::steal() }
         });
-    for led in 0usize..4 {
-        led.set_led(false);
-    }
-    0usize.set_led(true);
-
     let gpio = gpio(&mut p.CCU1, &mut p.RGU, p.GPIO_PORT);
-    1usize.set_led(true);
+    let mut led1 = LED1::setup(gpio.p2_1);
+    let mut led2 = LED2::setup(gpio.p2_2);
+    let mut led3 = LED3::setup(gpio.p2_8);
+    let mut led4 = LED4::setup(gpio.p5_26);
+    led1.on();
+    led4.set(stolen);
+
+    led2.on();
     let mut display = lcd(
         &mut p.CGU, &mut p.CCU1,
         &mut p.SSP1,
         gpio.p4_12.into_output()
     );
-    2usize.set_led(true);
+    led3.on();
     let mut console = TextConsole::new();
-    0usize.set_led(false);
+    led1.off();
 
     // extern "C" {
     //     static mut __sbss: u32;
@@ -55,17 +58,17 @@ fn main() {
     let mut t = 0usize;
     loop {
         writeln!(console.output(&mut display), "Hello").unwrap();
-        2usize.set_led(true);
+        led3.on();
         writeln!(console.output(&mut display), "t={}", t).unwrap();
 
-        2usize.set_led(false);
-        display.select().display(|x, y| {
-            RGB12 {
-                r: (x ^ y ^ t) as u8,
-                g: (y ^ t) as u8,
-                b: (y ^ t) as u8,
-            }
-        });
+        led3.off();
+        // display.select().display(|x, y| {
+        //     RGB12 {
+        //         r: (x ^ y ^ t) as u8,
+        //         g: (y ^ t) as u8,
+        //         b: (y ^ t) as u8,
+        //     }
+        // });
         t += 1;
     }
 }

@@ -44,8 +44,7 @@ extern crate vga_framebuffer;
 pub mod startup;
 /// Blinking LEDs
 mod led;
-pub use led::{LED, IdentifyLED};
-pub use led::LED::*;
+pub use led::*;
 /// LCD
 pub mod lcd;
 pub use lcd::lcd;

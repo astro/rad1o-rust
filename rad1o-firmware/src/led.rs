@@ -1,62 +1,39 @@
-use target::Peripherals;
+use embedded_hal::digital::OutputPin;
+use hal::gpio::{Output, P2_1, P2_2, P2_8, P5_26};
 
-pub trait IdentifyLED {
-    /// Set/clear one of the four LEDs.
-    fn set_led(&self, set: bool);
-}
-
-impl IdentifyLED for usize {
-    fn set_led(&self, set: bool) {
-        let (port, pin) = match *self & 3 {
-            0 =>
-                (2, 1),
-            1 =>
-                (2, 2),
-            2 =>
-                (2, 8),
-            3 =>
-                (5, 26),
-            _ =>
-                unreachable!(),
-        };
-        let mask = 1 << pin;
-        let p: Peripherals = unsafe { Peripherals::steal() };
-        if ! set {
-            p.GPIO_PORT.clr[port].write(|w| unsafe {
-                w.bits(mask)
-            });
-        } else {
-            p.GPIO_PORT.set[port].write(|w| unsafe {
-                w.bits(mask)
-            });
+macro_rules! def_led {
+    ($LED:ident, $PIN:tt) => (
+        pub struct $LED {
+            pin: $PIN<Output>
         }
-    }
-}
 
-impl IdentifyLED for u8 {
-    fn set_led(&self, set: bool) {
-        usize::from(*self).set_led(set)
-    }
-}
+        impl $LED {
+            pub fn setup<M>(pin: $PIN<M>) -> Self {
+                $LED {
+                    pin: pin.into_output()
+                }
+            }
 
-pub enum LED {
-    /// Green LED in the lower left corner
-    LED1,
-    /// Green LED in the lower right corner
-    LED2,
-    /// Green LED on the left side
-    LED3,
-    /// Red LED on the top
-    LED4,
-}
+            pub fn off(&mut self) {
+                self.pin.set_low()
+            }
 
-impl IdentifyLED for LED {
-    fn set_led(&self, set: bool) {
-        match *self {
-            LED::LED1 => 0usize.set_led(set),
-            LED::LED2 => 1usize.set_led(set),
-            LED::LED3 => 2usize.set_led(set),
-            LED::LED4 => 3usize.set_led(set),
+            pub fn on(&mut self) {
+                self.pin.set_high()
+            }
+
+            pub fn set(&mut self, set: bool) {
+                if set {
+                    self.on()
+                } else {
+                    self.off()
+                }
+            }
         }
-    }
+    )
 }
+
+def_led!(LED1, P2_1);
+def_led!(LED2, P2_2);
+def_led!(LED3, P2_8);
+def_led!(LED4, P5_26);

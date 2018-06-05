@@ -41,15 +41,14 @@ macro_rules! gpio {
             type Parts = Parts;
 
             fn split(self, ccu1: &mut CCU1, rgu: &mut RGU) -> Parts {
-                // ccu1.clk_m4_gpio_cfg.write(
-                //     |w| w
-                //         .run().enabled()
-                //         .auto().enabled()
-                // );
-                // rgu.reset_ctrl0.write(
-                //     |w| w.gpio_rst().set_bit()
-                // );
-
+                ccu1.clk_m4_gpio_cfg.write(
+                    |w| w
+                        .run().enabled()
+                        .auto().enabled()
+                );
+                rgu.reset_ctrl0.write(
+                    |w| w.gpio_rst().set_bit()
+                );
 
                 Parts {
                     $(
