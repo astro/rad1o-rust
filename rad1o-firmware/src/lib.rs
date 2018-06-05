@@ -48,6 +48,9 @@ pub use led::*;
 /// LCD
 pub mod lcd;
 pub use lcd::lcd;
+/// Joystick
+pub mod input;
+pub use input::Input;
 
 use target::{CCU1, RGU, GPIO_PORT};
 use hal::gpio;

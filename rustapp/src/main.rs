@@ -10,7 +10,7 @@ extern crate rad1o_firmware as rad1o;
 
 use core::fmt::Write;
 use lpc43xx::Peripherals;
-use rad1o::{LED1, LED2, LED3, LED4, gpio, lcd, lcd::RGB12, lcd::TextConsole};
+use rad1o::{LED1, LED2, LED3, LED4, Input, gpio, lcd, lcd::RGB12, lcd::TextConsole, lcd::Backlight};
 
 entry!(main);
 
@@ -51,24 +51,43 @@ fn main() {
     // while p < unsafe { &mut __ebss } {
     //     let v = unsafe { *p };
     //     writeln!(console.output(&mut display), "{:08X}:\n {:08X}", p as usize, v);
-        
+
     //     p = unsafe{ p.offset(1) };
     // }
 
+    let mut backlight = Backlight::setup(gpio.p0_8);
+    let input = Input::setup(
+        gpio.p5_20,
+        gpio.p5_21,
+        gpio.p5_22,
+        gpio.p5_23,
+        gpio.p5_24
+    );
+
     let mut t = 0usize;
     loop {
-        writeln!(console.output(&mut display), "Hello").unwrap();
+        backlight.set(t % 100 < 50);
         led3.on();
-        writeln!(console.output(&mut display), "t={}", t).unwrap();
+
+        let mut output = console.output(&mut display);
+        writeln!(output, "t={}", t).unwrap();
+        if input.down() {
+            writeln!(output, "down").unwrap();
+        }
+        if input.up() {
+            writeln!(output, "up").unwrap();
+        }
+        if input.left() {
+            writeln!(output, "left").unwrap();
+        }
+        if input.right() {
+            writeln!(output, "right").unwrap();
+        }
+        if input.enter() {
+            writeln!(output, "enter").unwrap();
+        }
 
         led3.off();
-        // display.select().display(|x, y| {
-        //     RGB12 {
-        //         r: (x ^ y ^ t) as u8,
-        //         g: (y ^ t) as u8,
-        //         b: (y ^ t) as u8,
-        //     }
-        // });
         t += 1;
     }
 }
