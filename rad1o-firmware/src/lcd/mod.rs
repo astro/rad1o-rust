@@ -7,6 +7,8 @@ pub use self::pcf8833::{PCF8833, Selected,
                         ColorFormat, RGB12};
 mod console;
 pub use self::console::{TextConsole, ConsoleOutput};
+mod backlight;
+pub use self::backlight::Backlight;
 
 type CsPin = gpio::P4_12<gpio::Output>;
 

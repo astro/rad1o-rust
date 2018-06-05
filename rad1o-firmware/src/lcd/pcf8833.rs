@@ -2,7 +2,6 @@ use core::mem::replace;
 use embedded_hal::digital::OutputPin;
 use embedded_hal::blocking::spi::{Transfer, Write};
 
-// TODO: 132×132?
 pub const RESX: usize = 130;
 pub const RESY: usize = 130;
 const SSP_DATA_9BITS: u8  = 0x8;
