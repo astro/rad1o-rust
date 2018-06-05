@@ -49,7 +49,7 @@ pub struct Selected<'a, CS: 'a + OutputPin, SPI: 'a + Transfer<u16>> {
 
 impl<'a, CS: OutputPin, SPI: Transfer<u16>> Selected<'a, CS, SPI> {
     pub fn new(pcf: &'a mut PCF8833<CS, SPI>) -> Self {
-        pcf.cs.set_high();
+        pcf.cs.set_low();
         Selected { pcf }
     }
 
@@ -92,7 +92,7 @@ impl<'a, CS: OutputPin, SPI: Transfer<u16>> Selected<'a, CS, SPI> {
 
 impl<'a, CS: OutputPin, SPI: Transfer<u16>> Drop for Selected<'a, CS, SPI> {
     fn drop(&mut self) {
-        self.pcf.cs.set_low();
+        self.pcf.cs.set_high();
     }
 }
 

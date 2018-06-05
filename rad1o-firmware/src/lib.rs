@@ -49,3 +49,12 @@ pub use led::LED::*;
 /// LCD
 pub mod lcd;
 pub use lcd::lcd;
+
+use target::{CCU1, RGU, GPIO_PORT};
+use hal::gpio;
+use hal::gpio::GpioExt;
+
+pub fn gpio(ccu1: &mut CCU1, rgu: &mut RGU, gpio_port: GPIO_PORT) -> gpio::Parts {
+
+    gpio_port.split(ccu1, rgu)
+}

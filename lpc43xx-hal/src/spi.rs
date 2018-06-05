@@ -1,14 +1,59 @@
-use target::Peripherals;
-use target::ssp0::RegisterBlock;
+use target::{CGU, CCU1, SSP0, SSP1, ssp0};
 //TODO: use hal::spi::{FullDuplex, Mode, Phase, Polarity};
 use hal::blocking::spi::{Transfer, Write};
 
+pub trait SspExt {
+    type Target;
+
+    fn setup(self, &mut CGU, &mut CCU1) -> Self::Target;
+}
+
+impl<'a> SspExt for &'a mut SSP0 {
+    type Target = SspSpi<'a>;
+
+    fn setup(self, cgu: &mut CGU, ccu: &mut CCU1) -> Self::Target {
+        /* use PLL1 as clock source for SSP0 */
+        cgu.base_ssp0_clk.write(|w| {
+            w
+                .autoblock().enabled()
+                .clk_sel().pll1()
+        });
+        /* Enable SSP0 Clock */
+        ccu.clk_m4_ssp0_cfg.write(|w| {
+            w.run().enabled()
+        });
+
+        SspSpi { ssp: self }
+    }
+}
+
+impl<'a> SspExt for &'a mut SSP1 {
+    type Target = SspSpi<'a>;
+
+    fn setup(self, cgu: &mut CGU, ccu: &mut CCU1) -> Self::Target {
+        /* use PLL1 as clock source for SSP1 */
+        cgu.base_ssp1_clk.write(|w| {
+            w
+                .autoblock().enabled()
+                .clk_sel().pll1()
+        });
+        /* Enable SSP1 Clock */
+        ccu.clk_m4_ssp1_cfg.write(|w| {
+            w.run().enabled()
+        });
+
+        SspSpi { ssp: self }
+    }
+}
+
 pub struct SspSpi<'a> {
-    ssp: &'a RegisterBlock,
+    ssp: &'a ssp0::RegisterBlock,
 }
 
 impl<'a> SspSpi<'a> {
-    pub fn new(p: &'a Peripherals) -> Self {
+    pub fn configure(self) -> SspSpiDev<'a> {
+        let ssp = self.ssp;
+
         /*
          * The LCD requires 9-Bit frames
          * Freq = PCLK / (CPSDVSR * [SCR+1])
@@ -21,25 +66,14 @@ impl<'a> SspSpi<'a> {
         let serial_clock_rate = 1u8;
         let clock_prescale_rate = 12u8;
 
-        /* use PLL1 as clock source for SSP1 */
-        p.CGU.base_ssp1_clk.write(|w| {
-            w
-                .autoblock().enabled()
-                .clk_sel().pll1()
-        });
-        /* Enable SSP1 Clock */
-        p.CCU1.clk_m4_ssp1_cfg.write(|w| {
-            w.run().enabled()
-        });
-
         /* Disable SSP before to configure it */
-        p.SSP1.cr1.write(|w| w.sse().disabled());
+        ssp.cr1.write(|w| w.sse().disabled());
 
         /* Configure SSP */
-        p.SSP1.cpsr.write(|w| unsafe {
+        ssp.cpsr.write(|w| unsafe {
             w.cpsdvsr().bits(clock_prescale_rate)
         });
-        p.SSP1.cr0.write(|w| unsafe {
+        ssp.cr0.write(|w| unsafe {
             w
                 .dss()._9_bit_transfer()
                 .frf().spi()
@@ -49,7 +83,7 @@ impl<'a> SspSpi<'a> {
         });
         
         /* Enable SSP */
-        p.SSP1.cr1.write(|w| {
+        ssp.cr1.write(|w| {
             w
                 .lbm().normal()
                 .sse().enabled()
@@ -57,10 +91,15 @@ impl<'a> SspSpi<'a> {
                 .sod().clear_bit()
         });
 
-        let ssp = &p.SSP1;
-        SspSpi { ssp }
+        SspSpiDev { ssp }
     }
+}
 
+pub struct SspSpiDev<'a> {
+    ssp: &'a ssp0::RegisterBlock,
+}
+
+impl<'a> SspSpiDev<'a> {
     fn transfer_data(&self, data: u16) -> u16 {
         let ssp = self.ssp;
         /* Wait until Tx-fifo-Not-Full */
@@ -86,7 +125,7 @@ impl<'a> SspSpi<'a> {
     }
 }
 
-impl<'a> Write<u16> for SspSpi<'a> {
+impl<'a> Write<u16> for SspSpiDev<'a> {
     type Error = ();
 
     fn write(&mut self, words: &[u16]) -> Result<(), Self::Error> {
@@ -97,7 +136,7 @@ impl<'a> Write<u16> for SspSpi<'a> {
     }
 }
 
-impl<'a> Transfer<u16> for SspSpi<'a> {
+impl<'a> Transfer<u16> for SspSpiDev<'a> {
     type Error = ();
 
     fn transfer<'w>(&mut self, words: &'w mut [u16]) -> Result<&'w [u16], Self::Error> {
