@@ -13,3 +13,4 @@ include = ["Cargo.toml", "**/*.rs"]
 [dependencies]
 lpc43xx = "0.1.0"
 embedded-hal = { version = "0.2.1", features = ["unproven"] }
+vcell = "0.1.0"

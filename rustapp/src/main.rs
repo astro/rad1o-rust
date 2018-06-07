@@ -10,7 +10,7 @@ extern crate rad1o_firmware as rad1o;
 
 use core::fmt::Write;
 use lpc43xx::Peripherals;
-use rad1o::{LED1, LED2, LED3, LED4, Input, gpio, lcd, lcd::RGB12, lcd::TextConsole, lcd::Backlight};
+use rad1o::{LED1, LED2, LED3, LED4, Input, gpio, lcd, lcd::RGB12, lcd::TextConsole, lcd::Backlight, flash};
 
 entry!(main);
 
@@ -56,6 +56,7 @@ fn main() {
     // }
 
     let mut backlight = Backlight::setup(gpio.p0_8);
+    backlight.on();
     let input = Input::setup(
         gpio.p5_20,
         gpio.p5_21,
@@ -64,30 +65,28 @@ fn main() {
         gpio.p5_24
     );
 
+    led4.on();
+    let flash = flash(p.SPIFI);
+    let mut buf = [0u8; 8];
+    led4.off();
+
     let mut t = 0usize;
+    let mut offset = 0;
     loop {
-        backlight.set(t % 100 < 50);
         led3.on();
+        flash.read(offset, &mut buf);
+        led3.off();
+        offset += buf.len() as u32;
+        if offset >= 1024 * 1024 {
+            offset = 0;
+        }
 
         let mut output = console.output(&mut display);
-        writeln!(output, "t={}", t).unwrap();
-        if input.down() {
-            writeln!(output, "down").unwrap();
+        for b in &buf {
+            write!(output, "{:02X}", b).unwrap();
         }
-        if input.up() {
-            writeln!(output, "up").unwrap();
-        }
-        if input.left() {
-            writeln!(output, "left").unwrap();
-        }
-        if input.right() {
-            writeln!(output, "right").unwrap();
-        }
-        if input.enter() {
-            writeln!(output, "enter").unwrap();
-        }
+        writeln!(output, "");
 
-        led3.off();
         t += 1;
     }
 }

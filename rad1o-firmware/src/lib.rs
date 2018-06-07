@@ -51,6 +51,8 @@ pub use lcd::lcd;
 /// Joystick
 pub mod input;
 pub use input::Input;
+/// SPI flash storage
+pub mod flash;
 
 use target::{CCU1, RGU, GPIO_PORT};
 use hal::gpio;
@@ -59,4 +61,13 @@ use hal::gpio::GpioExt;
 pub fn gpio(ccu1: &mut CCU1, rgu: &mut RGU, gpio_port: GPIO_PORT) -> gpio::Parts {
 
     gpio_port.split(ccu1, rgu)
+}
+
+use target::SPIFI;
+use hal::spifi::FlashInterface;
+use flash::Flash;
+
+pub fn flash(spifi: SPIFI) -> Flash {
+    let iface = FlashInterface::new(spifi);
+    Flash::new(iface)
 }
