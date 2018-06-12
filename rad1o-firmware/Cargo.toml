@@ -14,8 +14,10 @@ r0 = "0.2.2"
 cortex-m-rt = { version = "0.5.1", features = ["device"] }
 lpc43xx = { version = "0.1.0", features = ["rt"] }
 embedded-hal = "0.2.1"
-lpc43xx-hal = { path = "../lpc43xx-hal" }
+lpc43xx-hal = "0.0.0"
 vga-framebuffer = "0.2.1"
+fatfs = { version = "0.2.0", default-features = false }
+core_io = "0.1"
 
 [profile.release]
 debug = 2

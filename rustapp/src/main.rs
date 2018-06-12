@@ -10,7 +10,7 @@ extern crate rad1o_firmware as rad1o;
 
 use core::fmt::Write;
 use lpc43xx::Peripherals;
-use rad1o::{LED1, LED2, LED3, LED4, Input, gpio, lcd, lcd::RGB12, lcd::TextConsole, lcd::Backlight, flash};
+use rad1o::{LED1, LED2, LED3, LED4, Input, gpio, lcd, lcd::RGB12, lcd::TextConsole, lcd::Backlight, flash, filesystem};
 
 entry!(main);
 
@@ -66,7 +66,8 @@ fn main() {
     );
 
     led4.on();
-    let flash = flash(p.SPIFI);
+    let mut flash = flash(p.SPIFI).io();
+    let fs = filesystem(&mut flash);
     let mut buf = [0u8; 8];
     led4.off();
 
@@ -74,7 +75,11 @@ fn main() {
     let mut offset = 0;
     loop {
         led3.on();
-        flash.read(offset, &mut buf);
+        let root = fs.root_dir();
+        for e in root.iter().filter_map(|e| e.ok()) {
+            let mut output = console.output(&mut display);
+            writeln!(output, "/{}", e.file_name());
+        }
         led3.off();
         offset += buf.len() as u32;
         if offset >= 1024 * 1024 {

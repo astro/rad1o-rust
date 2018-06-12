@@ -39,6 +39,8 @@ extern crate lpc43xx_hal as hal;
 extern crate r0;
 extern crate embedded_hal;
 extern crate vga_framebuffer;
+extern crate fatfs;
+extern crate core_io as io;
 
 /// firmware startup
 pub mod startup;
@@ -53,6 +55,7 @@ pub mod input;
 pub use input::Input;
 /// SPI flash storage
 pub mod flash;
+pub mod flash_io;
 
 use target::{CCU1, RGU, GPIO_PORT};
 use hal::gpio;
@@ -70,4 +73,12 @@ use flash::Flash;
 pub fn flash(spifi: SPIFI) -> Flash {
     let iface = FlashInterface::new(spifi);
     Flash::new(iface)
+}
+
+use flash_io::FlashIO;
+use fatfs::{FileSystem, FsOptions};
+
+pub fn filesystem(flash_io: &mut FlashIO) -> FileSystem {
+    let opts = FsOptions::new();
+    FileSystem::new(flash_io, opts).unwrap()
 }

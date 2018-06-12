@@ -1,5 +1,6 @@
 use target::spifi::cmd::{DOUTW, FIELDFORMW, FRAMEFORMW};
 use hal::spifi::FlashInterface;
+use flash_io::FlashIO;
 
 const OP_READ_S2: u8 = 0x35;
 const OP_QREAD: u8 = 0xEB;
@@ -12,6 +13,10 @@ pub struct Flash {
 impl Flash {
     pub fn new(iface: FlashInterface) -> Self {
         Flash { iface }
+    }
+
+    pub fn io(self) -> FlashIO {
+        FlashIO::new(self)
     }
 
     pub fn read(&self, addr: u32, buf: &mut [u8]) {
